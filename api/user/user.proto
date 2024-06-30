@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+option go_package = "user";
+
+package user;
+
+service UserService {
+    rpc HealthCheck(HealthCheckReq) returns (HealthCheckRes) {}
+
+    rpc SignUp(SignupReq) returns (SignupRes) {}
+    rpc VerifyUser(VerifyUserReq) returns (VerifyUserRes) {}
+    rpc Onboard(OnboardingReq) returns (OnboardingRes) {}
+}
+
+message HealthCheckRes{
+    bool ok = 1;
+}
+
+message HealthCheckReq {}
+
+message SignupReq {
+   optional string country_code = 1;
+   string input_field = 2;
+}
+
+message VerifyUserReq {
+    int32 code = 1;
+}
+
+message OnboardingReq {
+    string user_id = 1;
+    string user_name = 2; // Full Name for the user
+    string password = 3;
+    // TODO: Fill this more information
+}
+
+message SignupRes {
+    string user_id = 1; // to be sent while verifying otp
+}
+
+message VerifyUserRes {
+    bool verified = 1;
+}
+
+message OnboardingRes {
+    bool ok = 1;
+}
