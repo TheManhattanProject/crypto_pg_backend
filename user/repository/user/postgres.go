@@ -14,6 +14,13 @@ type UserRepositoryImpl struct {
 	db     *sql.DB
 }
 
+func NewUserRepositoryImpl(cfg *config.Config, db *sql.DB) *UserRepositoryImpl {
+	return &UserRepositoryImpl{
+		config: cfg,
+		db:     db,
+	}
+}
+
 func (repo *UserRepositoryImpl) Create(
 	ctx context.Context,
 	user userdomain.User,

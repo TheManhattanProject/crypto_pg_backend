@@ -24,7 +24,17 @@ type Repository interface {
 	Update(context.Context, User) (*User, error)
 }
 
+type Cache interface {
+	CreateAndSetOTP(
+		context.Context,
+		uuid.UUID,
+	) (string, error) // Create and set the OTP (can be revised)
+	GetOTP(context.Context, uuid.UUID) (string, error)
+}
+
 type UseCase interface { // the service implementation
 	CreateOrUpdateUser(context.Context, User) (User, error)
 	GetByID(context.Context, uuid.UUID) (User, error)
+	SendOTP(context.Context, uuid.UUID) error
+	ValidateOTP(context.Context, uuid.UUID, string) (bool, error)
 }
