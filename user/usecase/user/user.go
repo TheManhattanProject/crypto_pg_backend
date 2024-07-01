@@ -12,13 +12,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserUsecaseImpl struct {
+type userUsecaseImpl struct {
 	cfg   *config.Config
 	repo  userdomain.Repository
 	cache userdomain.Cache
 }
 
-func (impl *UserUsecaseImpl) CreateOrUpdateUser(
+func (impl *userUsecaseImpl) CreateOrUpdateUser(
 	ctx context.Context,
 	user userdomain.User,
 ) (*userdomain.User, error) {
@@ -26,15 +26,17 @@ func (impl *UserUsecaseImpl) CreateOrUpdateUser(
 		// Update
 	}
 
-	encryptedPassword, err := bcrypt.GenerateFromPassword(
-		[]byte(user.Password),
-		impl.cfg.HashRounds,
-	)
-	if err != nil {
-		return nil, err
-	}
+	if user.Password != "" {
+		encryptedPassword, err := bcrypt.GenerateFromPassword(
+			[]byte(user.Password),
+			impl.cfg.HashRounds,
+		)
+		if err != nil {
+			return nil, err
+		}
 
-	user.Password = string(encryptedPassword)
+		user.Password = string(encryptedPassword)
+	}
 
 	// TODO impl country mapping
 	user.Country = "INDIA"
@@ -42,7 +44,7 @@ func (impl *UserUsecaseImpl) CreateOrUpdateUser(
 	return impl.repo.Create(ctx, user)
 }
 
-func (impl *UserUsecaseImpl) GetByID(ctx context.Context, id uuid.UUID) (*userdomain.User, error) {
+func (impl *userUsecaseImpl) GetByID(ctx context.Context, id uuid.UUID) (*userdomain.User, error) {
 	user, err := impl.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -51,7 +53,7 @@ func (impl *UserUsecaseImpl) GetByID(ctx context.Context, id uuid.UUID) (*userdo
 	return user, err
 }
 
-func (impl *UserUsecaseImpl) SendOTP(ctx context.Context, id uuid.UUID) error {
+func (impl *userUsecaseImpl) SendOTP(ctx context.Context, id uuid.UUID) error {
 
 	// Check user exists
 	_, err := impl.repo.GetByID(ctx, id)
@@ -74,7 +76,7 @@ func (impl *UserUsecaseImpl) SendOTP(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (impl *UserUsecaseImpl) ValidateOTP(
+func (impl *userUsecaseImpl) ValidateOTP(
 	ctx context.Context,
 	id uuid.UUID,
 	otp string,
@@ -90,13 +92,24 @@ func (impl *UserUsecaseImpl) ValidateOTP(
 
 	cachedOTP, err := impl.cache.GetOTP(ctx, id)
 	if err != nil {
-		// Check against not found error code
 		return false, err
 	}
 
 	if cachedOTP != otp {
-		return false, fmt.Errorf("error: invalid otp")
+		return false, nil
 	}
 
 	return true, nil
+}
+
+func NewUserUsecaseImplementation(
+	config *config.Config,
+	db userdomain.Repository,
+	client userdomain.Cache,
+) userdomain.Usecase {
+	return &userUsecaseImpl{
+		cfg:   config,
+		repo:  db,
+		cache: client,
+	}
 }

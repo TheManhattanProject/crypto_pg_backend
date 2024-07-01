@@ -5,7 +5,7 @@ import "crypto/rand"
 func GenerateOTP(length int) (string, error) {
 	code := make([]byte, length)
 	if _, err := rand.Read(code); err != nil {
-		return 0, err
+		return "", err
 	}
 
 	for i := 0; i < length; i++ {

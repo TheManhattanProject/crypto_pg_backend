@@ -32,9 +32,9 @@ type Cache interface {
 	GetOTP(context.Context, uuid.UUID) (string, error)
 }
 
-type UseCase interface { // the service implementation
-	CreateOrUpdateUser(context.Context, User) (User, error)
-	GetByID(context.Context, uuid.UUID) (User, error)
+type Usecase interface { // the service implementation
+	CreateOrUpdateUser(context.Context, User) (*User, error)
+	GetByID(context.Context, uuid.UUID) (*User, error)
 	SendOTP(context.Context, uuid.UUID) error
 	ValidateOTP(context.Context, uuid.UUID, string) (bool, error)
 }

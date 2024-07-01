@@ -20,6 +20,7 @@ type Config struct {
 	RedisHost                   string        `env:"REDIS_HOST"                       envDefault:"redis"` // cause docker is being used
 	RedisPort                   int           `env:"REDIS_PORT"                       envDefault:"6379"`
 	RedisDB                     int           `env:"REDIS_DB"                         envDefault:"0"`
+	RedisPassword               string        `env:"REDIS_PASSWORD"                   envDefault:"redis"`
 	HashRounds                  int           `env:"HASH_ROUNDS"                      envDefault:"10"`
 	OTPExpiryTime               time.Duration `env:"OTP_EXPIRY_TIME"                  envDefault:"120s"`
 }
